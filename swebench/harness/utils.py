@@ -30,7 +30,11 @@ def get_conda_env_names(conda_source: str, env: dict = None) -> list:
     # Get list of conda environments
     try:
         conda_envs = subprocess.run(
-            f"{conda_source} env list".split(" "), check=True, capture_output=True, text=True, env=env,
+            f"{conda_source} env list".split(" "),
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
         )
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
@@ -55,11 +59,11 @@ def get_conda_env_names(conda_source: str, env: dict = None) -> list:
 
 
 def get_environment_yml(
-        instance: dict,
-        env_name: str,
-        save_path: str = None,
-        python_version: str = None,
-    ) -> str:
+    instance: dict,
+    env_name: str,
+    save_path: str = None,
+    python_version: str = None,
+) -> str:
     """
     Get environment.yml for given task instance
 
@@ -74,7 +78,11 @@ def get_environment_yml(
     # Attempt to find environment.yml at each path based on task instance's repo
     path_worked = False
 
-    commit = 'environment_setup_commit' if 'environment_setup_commit' in instance else 'base_commit'
+    commit = (
+        "environment_setup_commit"
+        if "environment_setup_commit" in instance
+        else "base_commit"
+    )
     for req_path in MAP_REPO_TO_ENV_YML_PATHS[instance["repo"]]:
         reqs_url = os.path.join(
             SWE_BENCH_URL_RAW, instance["repo"], instance[commit], req_path
@@ -148,7 +156,11 @@ def get_requirements(instance: dict, save_path: str = None):
     """
     # Attempt to find requirements.txt at each path based on task instance's repo
     path_worked = False
-    commit = 'environment_setup_commit' if 'environment_setup_commit' in instance else 'base_commit'
+    commit = (
+        "environment_setup_commit"
+        if "environment_setup_commit" in instance
+        else "base_commit"
+    )
 
     for req_path in MAP_REPO_TO_REQS_PATHS[instance["repo"]]:
         reqs_url = os.path.join(
@@ -215,15 +227,19 @@ def get_test_directives(instance: dict) -> list:
         directives (list): List of test directives
     """
     # HumanEvalFix: For seq2seq code repos, testing command is fixed
-    if any([
-        x == instance["repo"] for x in
-        ["swe-bench/humaneval", "swe-bench/humanevalfix-python"]
-    ]):
+    if any(
+        [
+            x == instance["repo"]
+            for x in ["swe-bench/humaneval", "swe-bench/humanevalfix-python"]
+        ]
+    ):
         return ["test.py"]
-    if any([
-        x == instance["repo"] for x in
-        ["swe-bench/humanevalfix-go", "swe-bench/humanevalfix-java"]
-    ]):
+    if any(
+        [
+            x == instance["repo"]
+            for x in ["swe-bench/humanevalfix-go", "swe-bench/humanevalfix-java"]
+        ]
+    ):
         return []
     if instance["repo"] == "swe-bench/humanevalfix-js":
         return ["test.js"]
@@ -249,7 +265,9 @@ def get_test_directives(instance: dict) -> list:
     return directives
 
 
-def clone_repo(repo_name: str, path: str, token: str = None) -> bool:
+def clone_repo(
+    repo_name: str, path: str, token: str = None, from_source: bool = False
+) -> bool:
     """
     Wrapper for cloning repo from swe-bench organization
 
@@ -263,11 +281,14 @@ def clone_repo(repo_name: str, path: str, token: str = None) -> bool:
     try:
         if token is None:
             token = os.environ.get("GITHUB_TOKEN", "git")
-        repo_url = (
-            f"https://{token}@github.com/swe-bench/"
-            + repo_name.replace("/", "__")
-            + ".git"
-        )
+        if from_source:
+            repo_url = f"https://{token}@github.com/{repo_name}.git"
+        else:
+            repo_url = (
+                f"https://{token}@github.com/swe-bench/"
+                + repo_name.replace("/", "__")
+                + ".git"
+            )
         Repo.clone_from(repo_url, path)
         return True
     except Exception as e:
@@ -440,22 +461,23 @@ def has_attribute_or_import_error(log_before):
     """
     log_before = log_before.lower()
 
-    if any([x in log_before for x in ['attribute', 'import']]):
+    if any([x in log_before for x in ["attribute", "import"]]):
+
         def get_lines_with_word(text, target_word):
             # Function to extract line(s) that contains target_word
             text, target_word = text.lower(), target_word.lower()
-            lines, hits = text.split('\n')[::-1], []
+            lines, hits = text.split("\n")[::-1], []
             for line in lines:
                 if target_word in line:
                     hits.append(line)
             return hits
-        
+
         # Get line with Attribute/Import error
-        lines_1 = get_lines_with_word(log_before, 'attribute')
-        lines_2 = get_lines_with_word(log_before, 'import')
+        lines_1 = get_lines_with_word(log_before, "attribute")
+        lines_2 = get_lines_with_word(log_before, "import")
         lines_1 = " ".join(lines_1)
         lines_2 = " ".join(lines_2)
 
-        if any([(x in lines_1 or x in lines_2) for x in ['error', 'fail']]):
+        if any([(x in lines_1 or x in lines_2) for x in ["error", "fail"]]):
             return True
     return False
