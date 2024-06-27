@@ -22,7 +22,9 @@ MAP_REPO_TO_VERSION_PATHS = {
     # Extension repos
     "pypa/pip": ["src/pip/__init__.py"],
     "aio-libs/aiohttp": ["aiohttp/__init__.py"],
-    "pallets/click": ["src/click/__init__.py", "pyproject.toml"],
+    "pallets/click": ["click/__init__.py", "src/click/__init__.py", "pyproject.toml"],
+    "networkx/networkx": ["networkx/__init__.py", "networkx/release.py"],
+    "pydantic/pydantic": ["pydantic/version.py"],
 }
 
 # Cosntants - Task Instance Version Regex Pattern
@@ -63,8 +65,17 @@ MAP_REPO_TO_VERSION_PATTERNS.update(
 )
 MAP_REPO_TO_VERSION_PATTERNS.update(
     {
-        k: [r'__version__ = [\'"](.*)[\'"]', r'version = [\'"](.*)[\'"]']
-        for k in ["pallets/click"]
+        k: [
+            r'__version__ = [\'"]([\.0-9a-zA-Z\-]*)[\'"]',
+            r'version = [\'"]([\.0-9a-zA-Z]*)[\'"]',
+        ]
+        for k in ["pallets/click", "networkx/networkx"]
+    }
+)
+MAP_REPO_TO_VERSION_PATTERNS.update(
+    {
+        k: [r"VERSION = (.*)", r"VERSION = StrictVersion\((.*)\)"]
+        for k in ["pydantic/pydantic"]
     }
 )
 

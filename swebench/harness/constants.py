@@ -681,12 +681,83 @@ MAP_VERSION_TO_INSTALL_HUMANEVAL = {k: {"python": "3.9"} for k in ["1.0"]}
 
 MAP_VERSION_TO_INSTALL_CLICK = {
     k: {
-        "python": "3.10",
+        "python": "3.9",
         "packages": "requirements.txt",
         "install": "pip install -e .",
     }
     for k in ["8.0", "8.1", "8.2"]
 }
+MAP_VERSION_TO_INSTALL_CLICK.update(
+    {
+        k: {
+            "python": "3.9",
+            "packages": "pytest",
+            "install": "pip install -e .",
+        }
+        for k in ["2.0", "4.0", "6.4", "6.5", "6.7", "7.0", "7.1"]
+    }
+)
+
+MAP_VERSION_TO_INSTALL_NETWORKX = {
+    k: {
+        "python": "3.10",
+        "packages": "requirements.txt",
+        "install": "pip install -e .",
+    }
+    for k in [f"3.{i:02d}" for i in range(41)]
+}
+MAP_VERSION_TO_INSTALL_NETWORKX.update(
+    {
+        k: {
+            "python": "3.9",
+            "packages": "requirements.txt",
+            "install": "pip install -e .",
+        }
+        for k in [f"2.{i}" for i in range(73)] + ["2.01"]
+    }
+)
+MAP_VERSION_TO_INSTALL_NETWORKX.update(
+    {
+        k: {
+            "python": "3.9",
+            "packages": "numpy scipy matplotlib pyyaml graphviz pytest",
+            "install": "pip install -e .",
+        }
+        for k in [f"0.{i:d}" for i in range(100)] + [f"1.{i}" for i in range(13)]
+    }
+)
+
+MAP_VERSION_TO_INSTALL_AIOHTTP = {
+    k: {
+        "python": "3.9",
+        "packages": "pytest",
+        "install": "make .develop",
+    }
+    # leaving out v0.* for now
+    for k in [f"{major}.{minor}" for major in range(3, 5) for minor in range(25)]
+}
+MAP_VERSION_TO_INSTALL_AIOHTTP.update(
+    {
+        k: {
+            "python": "3.5",
+            "packages": "chardet multidict pytest yarl async-timeout",
+            "install": "make .develop",
+        }
+        # leaving out v0.* for now
+        for k in [f"{major}.{minor}" for major in range(1, 3) for minor in range(3)]
+        + [f"0.{minor}" for minor in range(19, 25)]
+    }
+)
+
+MAP_VERSION_TO_INSTALL_TQDM = {
+    k: {
+        "python": "3.9",
+        "install": "pip install -e .",
+        "pip_packages": ["tox"],
+    }
+    for k in [f"{major}.{minor}" for major in range(2, 5) for minor in range(67)]
+}
+
 
 # Constants - Task Instance Instllation Environment
 MAP_VERSION_TO_INSTALL = {
@@ -715,6 +786,9 @@ MAP_VERSION_TO_INSTALL = {
     "sympy/sympy": MAP_VERSION_TO_INSTALL_SYMPY,
     # Extension repos
     "pallets/click": MAP_VERSION_TO_INSTALL_CLICK,
+    "networkx/networkx": MAP_VERSION_TO_INSTALL_NETWORKX,
+    "aio-libs/aiohttp": MAP_VERSION_TO_INSTALL_AIOHTTP,
+    "tqdm/tqdm": MAP_VERSION_TO_INSTALL_TQDM,
 }
 
 # Constants - Repository Specific Installation Instructions
@@ -748,6 +822,9 @@ MAP_REPO_TO_TEST_FRAMEWORK = {
     "sympy/sympy": "bin/test -C --verbose",
     # Extension repos
     "pallets/click": TEST_PYTEST,
+    "networkx/networkx": TEST_PYTEST,
+    "aio-libs/aiohttp": TEST_PYTEST,
+    "tqdm/tqdm": "make test",
 }
 
 # Constants - Task Instance Requirements File Paths
@@ -764,6 +841,16 @@ MAP_REPO_TO_REQS_PATHS = {
     "sympy/sympy": ["requirements-dev.txt"],
     # Extension repos
     "pallets/click": ["requirements/dev.txt"],
+    "networkx/networkx": [
+        "requirements/default.txt",
+        "requirements/extra.txt",
+        "requirements/test.txt",
+    ],
+    "aio-libs/aiohttp": [
+        "requirements/cython.txt",
+        "requirements/dev.txt",
+        "requirements/runtime-deps.txt",
+    ],
 }
 
 # Constants - Task Instance environment.yml File Paths

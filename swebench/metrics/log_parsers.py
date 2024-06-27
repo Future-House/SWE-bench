@@ -34,7 +34,7 @@ def parse_log_pytest_options(log: str) -> dict:
     Returns:
         dict: test case to test status mapping
     """
-    option_pattern = re.compile(r'(.*?)\[(.*)\]')
+    option_pattern = re.compile(r"(.*?)\[(.*)\]")
     test_status_map = {}
     for line in log.split("\n"):
         if any([line.startswith(x.value) for x in TestStatus]):
@@ -47,9 +47,13 @@ def parse_log_pytest_options(log: str) -> dict:
             has_option = option_pattern.search(test_case[1])
             if has_option:
                 main, option = has_option.groups()
-                if option.startswith('/') and not option.startswith('//') and '*' not in option:
-                    option = "/" + option.split('/')[-1]
-                test_name = f'{main}[{option}]'
+                if (
+                    option.startswith("/")
+                    and not option.startswith("//")
+                    and "*" not in option
+                ):
+                    option = "/" + option.split("/")[-1]
+                test_name = f"{main}[{option}]"
             else:
                 test_name = test_case[1]
             test_status_map[test_name] = test_case[0]
@@ -186,6 +190,10 @@ parse_log_astropy = parse_log_pytest_v2
 parse_log_scikit = parse_log_pytest_v2
 parse_log_sphinx = parse_log_pytest_v2
 
+parse_log_click = parse_log_pytest
+parse_log_networkx = parse_log_pytest
+parse_log_aiohttp = parse_log_pytest
+parse_log_tqdm = parse_log_pytest_v2
 
 MAP_REPO_TO_PARSER = {
     "astropy/astropy": parse_log_astropy,
@@ -206,4 +214,8 @@ MAP_REPO_TO_PARSER = {
     "sqlfluff/sqlfluff": parse_log_sqlfluff,
     "sphinx-doc/sphinx": parse_log_sphinx,
     "sympy/sympy": parse_log_sympy,
+    "pallets/click": parse_log_click,
+    "networkx/networkx": parse_log_networkx,
+    "aio-libs/aiohttp": parse_log_aiohttp,
+    "tqdm/tqdm": parse_log_tqdm,
 }

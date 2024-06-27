@@ -155,28 +155,26 @@ def get_requirements(instance: dict, save_path: str = None):
             Otherwise, returns requirements.txt as string
     """
     # Attempt to find requirements.txt at each path based on task instance's repo
-    path_worked = False
     commit = (
         "environment_setup_commit"
         if "environment_setup_commit" in instance
         else "base_commit"
     )
 
+    lines = []
     for req_path in MAP_REPO_TO_REQS_PATHS[instance["repo"]]:
         reqs_url = os.path.join(
             SWE_BENCH_URL_RAW, instance["repo"], instance[commit], req_path
         )
         reqs = requests.get(reqs_url)
         if reqs.status_code == 200:
-            path_worked = True
-            break
-    if not path_worked:
+            lines += reqs.text.split("\n")
+    if not lines:
         print(
             f"Could not find requirements.txt at paths {MAP_REPO_TO_REQS_PATHS[instance['repo']]}"
         )
         return None
 
-    lines = reqs.text
     original_req = []
     additional_reqs = []
     req_dir = "/".join(req_path.split("/")[:-1])
@@ -184,7 +182,7 @@ def get_requirements(instance: dict, save_path: str = None):
         [line.strip().startswith(x) for x in ["-e .", "#", ".[test"]]
     )
 
-    for line in lines.split("\n"):
+    for line in lines:
         if line.strip().startswith("-r"):
             # Handle recursive requirements
             file_name = line[len("-r") :].strip()
@@ -289,7 +287,7 @@ def clone_repo(
                 + repo_name.replace("/", "__")
                 + ".git"
             )
-        Repo.clone_from(repo_url, path)
+        Repo.clone_from(repo_url, path, recurse_submodules=True)
         return True
     except Exception as e:
         print(e)

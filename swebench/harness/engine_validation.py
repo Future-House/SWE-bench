@@ -12,6 +12,15 @@ from swebench.harness.utils import get_instances, split_instances, DotDict
 SKIP_INSTANCES = {"pytest-dev/pytest": ["6387", "7956", "3805"]}
 
 
+"""
+class Pool:
+    def __init__(self, *args, **kwargs): ...
+
+    def map(self, *args, **kwargs):
+        return list(map(*args, **kwargs))
+"""
+
+
 def validate_args(args):
     """
     Validation for command line arguments
@@ -116,7 +125,7 @@ def setup_testbed(data: dict):
             data_dict.func(distributed_task_list[0])
             return
 
-        pool = Pool(processes=len(distributed_task_list))
+        pool = Pool(processes=min(8, len(distributed_task_list)))
         pool.map(data_dict.func, distributed_task_list)
         pool.close()
         pool.join()
